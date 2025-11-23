@@ -1,0 +1,94 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  transition: background 2s;
+  background: linear-gradient(120deg, #d9e7ff, #f4f7ff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#container {
+  text-align: center;
+  padding: 20px;
+  width: 330px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+}
+
+#title {
+  cursor: pointer;
+  user-select: none;
+}
+
+#timerDisplay {
+  font-size: 48px;
+  margin: 20px 0;
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0 percent { transform: scale(1); }
+  50 percent { transform: scale(1.04); }
+  100 percent { transform: scale(1); }
+}
+
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 8px;
+  background: #5b7fff;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+input[type="number"], input[type="text"] {
+  width: 80 percent;
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+}
+
+#durationBox {
+  margin-top: 12px;
+}
+
+#themeSelect {
+  margin-top: 15px;
+  padding: 7px;
+  border-radius: 6px;
+}
+
+#message {
+  margin-top: 20px;
+  font-size: 14px;
+  height: 26px;
+}
+
+/* Themes */
+body.calm {
+  background: linear-gradient(120deg, #cce3ff, #eef4ff);
+}
+
+body.cozy {
+  background: linear-gradient(120deg, #ffe0c1, #ffd7b3);
+}
+
+body.sharp {
+  background: linear-gradient(120deg, #d2d2d2, #f1f1f1);
+}
+
+/* Mobile */
+@media(max-width: 500px) {
+  #container { width: 90 percent; }
+  #timerDisplay { font-size: 40px; }
+}
