@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Timer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="container">
+
+    <h1 id="title">Study Timer</h1>
+
+    <input id="taskName" type="text" placeholder="What are you working on?">
+
+    <div id="timerDisplay">25:00</div>
+
+    <div id="controls">
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+
+    <div id="durationBox">
+      <label>Session length</label>
+      <input id="minutesInput" type="number" min="1" max="180" value="25">
+    </div>
+
+    <select id="themeSelect">
+      <option value="calm">Calm</option>
+      <option value="cozy">Cozy</option>
+      <option value="sharp">Sharp</option>
+    </select>
+
+    <div id="message"></div>
+
+    <audio id="ding" src="ding.mp3" preload="auto"></audio>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
