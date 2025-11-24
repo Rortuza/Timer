@@ -2,6 +2,19 @@
    AURA MINUTES - FINAL STABLE BUILD
    --------------------------- */
 
+/* Ripple effect */
+function attachRipple(button) {
+  button.addEventListener("click", function(e) {
+    const rect = button.getBoundingClientRect();
+    const ripple = document.createElement("span");
+    ripple.classList.add("ripple");
+    ripple.style.left = `${e.clientX - rect.left}px`;
+    ripple.style.top = `${e.clientY - rect.top}px`;
+    button.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 500);
+  });
+}
+
 let timer;
 let timeLeft;
 let isRunning = false;
@@ -26,8 +39,7 @@ const titleEl = document.getElementById("title");
 const canvas = document.getElementById("confettiCanvas");
 const ctx = canvas.getContext("2d");
 
-/* Encouragement messages */
-
+/* Encouragements */
 const encouragements = [
   "You are doing better than you think.",
   "Breathe, then keep going.",
@@ -42,7 +54,7 @@ const encouragements = [
 ];
 
 /* ------------------------------------------
-   SAFE INITIALIZATION (NO MORE CORRUPTION)
+   SAFE INITIALIZATION
    ------------------------------------------ */
 
 window.onload = () => {
@@ -53,7 +65,6 @@ window.onload = () => {
 
   const saved = JSON.parse(localStorage.getItem("studyState"));
 
-  /* Validate saved data safely */
   if (
     saved &&
     Number.isFinite(Number(saved.timeLeft)) &&
@@ -67,9 +78,7 @@ window.onload = () => {
     taskName.value = saved.task || "";
     notes.value = saved.notes || "";
   } else {
-    /* Clear broken saves */
     localStorage.removeItem("studyState");
-
     timeLeft = 25 * 60;
     minutesInput.value = 25;
     taskName.value = "";
@@ -85,6 +94,7 @@ window.onload = () => {
   document.querySelectorAll("button").forEach(attachRipple);
 
   setupListeners();
+
   setInterval(saveState, 4000);
 };
 
@@ -102,7 +112,6 @@ function setupListeners() {
 
   minutesInput.addEventListener("input", () => {
     let val = Number(minutesInput.value);
-
     if (!val || val < 1) val = 1;
     if (val > 180) val = 180;
 
@@ -177,7 +186,7 @@ function updateTitles() {
   const task = taskName.value.trim();
   if (task) {
     titleEl.textContent = task;
-    document.title = task + " • Aura Minutes";
+    document.title = `${task} • Aura Minutes`;
   } else {
     titleEl.textContent = "Aura Minutes";
     document.title = "Aura Minutes";
@@ -201,11 +210,12 @@ function showEncouragement() {
 
 function updateBackgroundGradient() {
   const progress = 1 - timeLeft / sessionDurationSeconds;
+
   const hue1 = 310 - progress * 25;
   const hue2 = 270 - progress * 20;
 
   document.body.style.background =
-    `linear-gradient(120deg, hsl(${hue1}, 90%, 88%), hsl(${hue2}, 75%, 80%))`;
+    `linear-gradient(120deg, hsl(${hue1}, 90 percent, 88 percent), hsl(${hue2}, 75 percent, 80 percent))`;
 }
 
 function resetIdleTimer() {
@@ -217,7 +227,7 @@ function resetIdleTimer() {
 }
 
 /* ------------------------------------------
-   TIMER LOGIC
+   TIMER
    ------------------------------------------ */
 
 function startTimer() {
@@ -240,6 +250,7 @@ function startTimer() {
       updateDisplay();
       clearInterval(timer);
       isRunning = false;
+
       container.classList.remove("active");
       ding.play();
       message.textContent = "Session complete";
@@ -252,7 +263,6 @@ function startTimer() {
     updateDisplay();
     updateBackgroundGradient();
     saveState();
-
   }, 1000);
 }
 
@@ -273,7 +283,6 @@ function resetTimer() {
   timeLeft = sessionDurationSeconds;
 
   confettiPieces = [];
-
   updateDisplay();
   updateBackgroundGradient();
   encouragementBox.textContent = "";
@@ -319,7 +328,7 @@ function spawnConfetti() {
       x: Math.random() * canvas.width,
       y: Math.random() * -canvas.height,
       size: Math.random() * 6 + 4,
-      color: `hsl(${Math.random() * 360}, 80%, 70%)`,
+      color: `hsl(${Math.random() * 360}, 80 percent, 70 percent)`,
       speedY: Math.random() * 3 + 2,
       life: Math.random() * 120 + 60
     });
@@ -345,10 +354,5 @@ function drawScene() {
     p.y += p.speedY;
     p.life--;
     ctx.fillStyle = p.color;
-    ctx.fillRect(p.x, p.y, p.size, p.size);
-  });
+    ctx.fillRect(p.x, p.y
 
-  confettiPieces = confettiPieces.filter(p => p.life > 0);
-
-  requestAnimationFrame(drawScene);
-}
