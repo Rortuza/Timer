@@ -354,5 +354,11 @@ function drawScene() {
     p.y += p.speedY;
     p.life--;
     ctx.fillStyle = p.color;
-    ctx.fillRect(p.x, p.y
+    ctx.fillRect(p.x, p.y, p.size, p.size);
+  });
+
+  confettiPieces = confettiPieces.filter(p => p.life > 0);
+
+  requestAnimationFrame(drawScene);
+}
 
