@@ -9,38 +9,7 @@ body {
   overflow: hidden;
 }
 
-/* Splash */
-
-#splash {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(255, 245, 255, 0.9);
-  z-index: 30;
-  transition: opacity 0.8s ease;
-}
-
-#splash.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-#splashContent {
-  text-align: center;
-  padding: 20px 28px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 10px 30px rgba(123, 69, 216, 0.25);
-}
-
-#splashContent h2 {
-  margin: 0 0 8px;
-  color: #7b45d8;
-}
-
-/* Canvas for particles and confetti */
+/* Canvas for particles + confetti */
 
 #confettiCanvas {
   position: fixed;
@@ -52,7 +21,7 @@ body {
   z-index: 0;
 }
 
-/* Main card */
+/* Main container */
 
 #container {
   position: relative;
@@ -73,8 +42,6 @@ body {
 #container.active {
   box-shadow: 0 0 35px rgba(152, 101, 255, 0.6);
 }
-
-/* Title */
 
 #title {
   cursor: pointer;
@@ -169,8 +136,7 @@ input[type="text"] {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-input[type="number"]:focus,
-input[type="text"]:focus {
+input:focus {
   border-color: #a26cff;
   box-shadow: 0 0 0 2px rgba(162, 108, 255, 0.2);
 }
@@ -181,7 +147,7 @@ input[type="text"]:focus {
   color: #7b45d8;
 }
 
-/* Encouragement */
+/* Encouragement text */
 
 #encouragement {
   margin-top: 15px;
@@ -201,10 +167,6 @@ input[type="text"]:focus {
 #music {
   width: 100%;
   margin-top: 8px;
-}
-
-#musicControls {
-  margin-top: 6px;
 }
 
 .loopLabel {
@@ -256,20 +218,14 @@ input[type="text"]:focus {
   color: #6f2bd4;
 }
 
-/* Animations */
+/* Fade-in animation */
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Mobile tweaks */
+/* Mobile */
 
 @media (max-width: 500px) {
   #container {
