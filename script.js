@@ -1,6 +1,6 @@
-/* ---------------------------------------------
-   AURA MINUTES - FULL FIXED SCRIPT
-   --------------------------------------------- */
+/* ---------------------------
+   AURA MINUTES - CLEAN SCRIPT
+   --------------------------- */
 
 let timer;
 let timeLeft;
@@ -23,12 +23,11 @@ const notes = document.getElementById("notes");
 const ding = document.getElementById("ding");
 const container = document.getElementById("container");
 const titleEl = document.getElementById("title");
-const splash = document.getElementById("splash");
-
 const canvas = document.getElementById("confettiCanvas");
 const ctx = canvas.getContext("2d");
 
-/* Encouragement messages */
+/* Encouragement pool */
+
 const encouragements = [
   "You are doing better than you think.",
   "Breathe, then keep going.",
@@ -43,9 +42,10 @@ const encouragements = [
 ];
 
 /* ---------------------------------------------------------
-   INIT EVERYTHING - main function called after splash hides
+   INIT EVERYTHING
    --------------------------------------------------------- */
-function initAura() {
+
+window.onload = () => {
   resizeCanvas();
   initAmbientParticles();
   drawScene();
@@ -68,10 +68,9 @@ function initAura() {
   updateDisplay();
   updateBackgroundGradient();
 
-  /* Attach ripple effects to buttons */
   document.querySelectorAll("button").forEach(attachRipple);
 
-  /* INPUT LISTENERS */
+  /* Input listeners */
 
   taskName.addEventListener("input", () => {
     updateTitles();
@@ -107,13 +106,14 @@ function initAura() {
     }
   };
 
-  /* BUTTON CONTROLS */
+  /* Buttons */
 
   document.getElementById("startBtn").onclick = startTimer;
   document.getElementById("pauseBtn").onclick = pauseTimer;
   document.getElementById("resetBtn").onclick = resetTimer;
 
-  /* PAGE TAB VISIBILITY */
+  /* Page visibility */
+
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && isRunning) {
       pauseTimer();
@@ -122,7 +122,8 @@ function initAura() {
     }
   });
 
-  /* TITLE EASTER EGG */
+  /* Easter egg */
+
   titleEl.onclick = () => {
     titleClicks++;
     if (titleClicks === 5) {
@@ -131,12 +132,14 @@ function initAura() {
     }
   };
 
-  /* ENCOURAGEMENT ROTATION */
+  /* Encouragement rotation */
+
   setInterval(() => {
     if (isRunning) showEncouragement();
   }, 90000);
 
-  /* WARN BEFORE CLOSING */
+  /* Warn before leaving */
+
   window.addEventListener("beforeunload", (e) => {
     if (isRunning) {
       e.preventDefault();
@@ -144,24 +147,11 @@ function initAura() {
     }
   });
 
-  /* AUTO SAVE EVERY 4 SECONDS */
   setInterval(saveState, 4000);
-}
-
-/* ---------------------------------------------------------
-   SPLASH SCREEN HANDLER - FIXED SO IT NEVER GETS STUCK
-   --------------------------------------------------------- */
-
-window.onload = () => {
-  /* Always wait for DOM to fully load */
-  setTimeout(() => {
-    splash.classList.add("hidden");
-    initAura();  
-  }, 600);  
 };
 
 /* ---------------------------------------------------------
-   UTILITIES AND EFFECTS
+   UTIL FUNCTIONS
    --------------------------------------------------------- */
 
 function saveState() {
@@ -199,7 +189,7 @@ function showEncouragement() {
     encouragements[Math.floor(Math.random() * encouragements.length)];
 }
 
-/* Background shifting more purple as time passes */
+/* Background shifting */
 function updateBackgroundGradient() {
   if (!sessionDurationSeconds || sessionDurationSeconds <= 0) return;
   const progress = 1 - timeLeft / sessionDurationSeconds;
@@ -209,7 +199,7 @@ function updateBackgroundGradient() {
     `linear-gradient(120deg, hsl(${hue1}, 90%, 88%), hsl(${hue2}, 75%, 80%))`;
 }
 
-/* Idle pulse on title */
+/* Idle pulse */
 function resetIdleTimer() {
   titleEl.classList.remove("idle");
   clearTimeout(idleTimeout);
@@ -218,7 +208,7 @@ function resetIdleTimer() {
   }, 20000);
 }
 
-/* Ripple animation */
+/* Button ripple */
 function attachRipple(button) {
   button.addEventListener("click", function (e) {
     const rect = button.getBoundingClientRect();
@@ -232,13 +222,12 @@ function attachRipple(button) {
 }
 
 /* ---------------------------------------------------------
-   TIMER FUNCTIONS
+   TIMER LOGIC
    --------------------------------------------------------- */
 
 function startTimer() {
   if (isRunning) return;
   isRunning = true;
-
   container.classList.add("active");
   message.textContent = "Focus mode on";
   showEncouragement();
@@ -256,12 +245,9 @@ function startTimer() {
       clearInterval(timer);
       isRunning = false;
       container.classList.remove("active");
-
-      updateBackgroundGradient();
       ding.play();
       message.textContent = "Session complete";
       showEncouragement();
-
       spawnConfetti();
       saveState();
       return;
@@ -276,3 +262,94 @@ function startTimer() {
 function pauseTimer() {
   if (!isRunning) return;
   clearInterval(timer);
+  isRunning = false;
+  container.classList.remove("active");
+  message.textContent = "Paused";
+  saveState();
+}
+
+function resetTimer() {
+  clearInterval(timer);
+  isRunning = false;
+  container.classList.remove("active");
+  sessionDurationSeconds = Number(minutesInput.value) * 60 || 1500;
+  timeLeft = sessionDurationSeconds;
+  confettiPieces = [];
+  updateDisplay();
+  updateBackgroundGradient();
+  encouragementBox.textContent = "";
+  message.textContent = "";
+  saveState();
+}
+
+/* ---------------------------------------------------------
+   PARTICLES + CONFETTI
+   --------------------------------------------------------- */
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+window.addEventListener("resize", () => {
+  resizeCanvas();
+  initAmbientParticles();
+});
+
+function initAmbientParticles() {
+  ambientParticles = [];
+  const count = 60;
+
+  for (let i = 0; i < count; i++) {
+    ambientParticles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 3 + 1,
+      speedY: Math.random() * 0.4 + 0.1,
+      alpha: Math.random() * 0.4 + 0.2
+    });
+  }
+}
+
+function spawnConfetti() {
+  confettiPieces = [];
+  const count = 160;
+
+  for (let i = 0; i < count; i++) {
+    confettiPieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      size: Math.random() * 6 + 4,
+      color: `hsl(${Math.random() * 360}, 80%, 70%)`,
+      speedY: Math.random() * 3 + 2,
+      life: Math.random() * 120 + 60
+    });
+  }
+}
+
+function drawScene() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ambientParticles.forEach(p => {
+    p.y += p.speedY;
+    if (p.y > canvas.height + 10) p.y = -10;
+    ctx.globalAlpha = p.alpha;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+  });
+
+  ctx.globalAlpha = 1;
+
+  confettiPieces.forEach(p => {
+    p.y += p.speedY;
+    p.life--;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, p.size, p.size);
+  });
+
+  confettiPieces = confettiPieces.filter(p => p.life > 0);
+
+  requestAnimationFrame(drawScene);
+}
