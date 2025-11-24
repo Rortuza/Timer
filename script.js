@@ -1,5 +1,5 @@
 /* ---------------------------
-   AURA MINUTES - STABLE BUILD
+   AURA MINUTES - FINAL STABLE BUILD
    --------------------------- */
 
 let timer;
@@ -42,7 +42,7 @@ const encouragements = [
 ];
 
 /* ------------------------------------------
-   SAFE INITIALIZATION
+   SAFE INITIALIZATION (NO MORE CORRUPTION)
    ------------------------------------------ */
 
 window.onload = () => {
@@ -53,21 +53,30 @@ window.onload = () => {
 
   const saved = JSON.parse(localStorage.getItem("studyState"));
 
-  if (saved) {
+  /* Validate saved data safely */
+  if (
+    saved &&
+    Number.isFinite(Number(saved.timeLeft)) &&
+    Number(saved.timeLeft) > 1 &&
+    Number.isFinite(Number(saved.duration)) &&
+    Number(saved.duration) >= 1 &&
+    Number(saved.duration) <= 180
+  ) {
     timeLeft = Number(saved.timeLeft);
-    if (!Number.isFinite(timeLeft) || timeLeft < 1) timeLeft = 25 * 60;
-
-    minutesInput.value = Number(saved.duration) || 25;
+    minutesInput.value = Number(saved.duration);
     taskName.value = saved.task || "";
     notes.value = saved.notes || "";
   } else {
+    /* Clear broken saves */
+    localStorage.removeItem("studyState");
+
     timeLeft = 25 * 60;
+    minutesInput.value = 25;
+    taskName.value = "";
+    notes.value = "";
   }
 
   sessionDurationSeconds = Number(minutesInput.value) * 60;
-  if (!Number.isFinite(sessionDurationSeconds) || sessionDurationSeconds < 1) {
-    sessionDurationSeconds = 25 * 60;
-  }
 
   updateTitles();
   updateDisplay();
@@ -76,7 +85,6 @@ window.onload = () => {
   document.querySelectorAll("button").forEach(attachRipple);
 
   setupListeners();
-
   setInterval(saveState, 4000);
 };
 
@@ -85,7 +93,6 @@ window.onload = () => {
    ------------------------------------------ */
 
 function setupListeners() {
-
   taskName.addEventListener("input", () => {
     updateTitles();
     saveState();
@@ -193,9 +200,7 @@ function showEncouragement() {
 }
 
 function updateBackgroundGradient() {
-  if (!sessionDurationSeconds) return;
   const progress = 1 - timeLeft / sessionDurationSeconds;
-
   const hue1 = 310 - progress * 25;
   const hue2 = 270 - progress * 20;
 
@@ -236,7 +241,6 @@ function startTimer() {
       clearInterval(timer);
       isRunning = false;
       container.classList.remove("active");
-
       ding.play();
       message.textContent = "Session complete";
       showEncouragement();
