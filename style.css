@@ -1,94 +1,279 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  transition: background 2s;
-  background: linear-gradient(120deg, #d9e7ff, #f4f7ff);
+  font-family: "Poppins", Arial, sans-serif;
+  background: linear-gradient(120deg, #ffd5f3, #d8c2ff);
+  transition: background 1.5s ease;
   min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Splash */
+
+#splash {
+  position: fixed;
+  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: rgba(255, 245, 255, 0.9);
+  z-index: 30;
+  transition: opacity 0.8s ease;
 }
 
+#splash.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#splashContent {
+  text-align: center;
+  padding: 20px 28px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 30px rgba(123, 69, 216, 0.25);
+}
+
+#splashContent h2 {
+  margin: 0 0 8px;
+  color: #7b45d8;
+}
+
+/* Canvas for particles and confetti */
+
+#confettiCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Main card */
+
 #container {
+  position: relative;
+  z-index: 10;
   text-align: center;
   padding: 20px;
-  width: 330px;
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(8px);
-  border-radius: 14px;
+  width: 340px;
+  margin: 60px auto 40px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 12px 35px rgba(116, 74, 204, 0.25);
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeInUp 0.8s ease forwards;
 }
+
+#container.active {
+  box-shadow: 0 0 35px rgba(152, 101, 255, 0.6);
+}
+
+/* Title */
 
 #title {
   cursor: pointer;
   user-select: none;
+  font-weight: 600;
+  font-size: 26px;
+  color: #7b45d8;
+  transition: transform 0.4s ease, text-shadow 0.4s ease;
 }
 
+#title.idle {
+  animation: idlePulse 2s ease-in-out infinite;
+}
+
+@keyframes idlePulse {
+  0% { transform: scale(1); text-shadow: 0 0 0 rgba(123, 69, 216, 0.3); }
+  50% { transform: scale(1.03); text-shadow: 0 0 18px rgba(123, 69, 216, 0.7); }
+  100% { transform: scale(1); text-shadow: 0 0 0 rgba(123, 69, 216, 0.3); }
+}
+
+/* Timer */
+
 #timerDisplay {
-  font-size: 48px;
+  font-size: clamp(38px, 10vw, 50px);
   margin: 20px 0;
+  color: #6f2bd4;
   animation: breathe 3s ease-in-out infinite;
 }
 
 @keyframes breathe {
-  0 percent { transform: scale(1); }
-  50 percent { transform: scale(1.04); }
-  100 percent { transform: scale(1); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Buttons */
+
+#controls {
+  margin-bottom: 6px;
 }
 
 button {
+  position: relative;
   padding: 10px 20px;
   margin: 5px;
   border: none;
-  border-radius: 8px;
-  background: #5b7fff;
+  border-radius: 10px;
+  background: #b388ff;
   color: white;
-  cursor: pointer;
   font-size: 14px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.2s;
+  box-shadow: 0 4px 12px rgba(143, 101, 255, 0.4);
 }
 
 button:hover {
-  opacity: 0.85;
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
-input[type="number"], input[type="text"] {
-  width: 80 percent;
+button:active {
+  transform: translateY(1px);
+}
+
+button .ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.6);
+  animation: ripple 0.5s linear;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  from { width: 0; height: 0; opacity: 0.8; }
+  to { width: 220px; height: 220px; opacity: 0; }
+}
+
+/* Inputs */
+
+input[type="number"],
+input[type="text"] {
+  width: 80%;
   padding: 8px;
   margin-top: 10px;
   border-radius: 6px;
-  border: 1px solid #aaa;
+  border: 1px solid #c8a9ff;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus {
+  border-color: #a26cff;
+  box-shadow: 0 0 0 2px rgba(162, 108, 255, 0.2);
 }
 
 #durationBox {
-  margin-top: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #7b45d8;
 }
 
-#themeSelect {
+/* Encouragement */
+
+#encouragement {
   margin-top: 15px;
-  padding: 7px;
-  border-radius: 6px;
+  font-size: 15px;
+  color: #7b45d8;
+  min-height: 22px;
 }
+
+/* Music */
+
+#musicPlayer {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #6f2bd4;
+}
+
+#music {
+  width: 100%;
+  margin-top: 8px;
+}
+
+#musicControls {
+  margin-top: 6px;
+}
+
+.loopLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* Notes */
+
+#notesBox {
+  margin-top: 18px;
+  text-align: left;
+  font-size: 13px;
+  color: #7b45d8;
+}
+
+#notesBox label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+#notes {
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  max-height: 140px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #c8a9ff;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#notes:focus {
+  border-color: #a26cff;
+  box-shadow: 0 0 0 2px rgba(162, 108, 255, 0.2);
+}
+
+/* Message */
 
 #message {
-  margin-top: 20px;
+  margin-top: 15px;
   font-size: 14px;
-  height: 26px;
+  height: 24px;
+  color: #6f2bd4;
 }
 
-/* Themes */
-body.calm {
-  background: linear-gradient(120deg, #cce3ff, #eef4ff);
+/* Animations */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-body.cozy {
-  background: linear-gradient(120deg, #ffe0c1, #ffd7b3);
-}
+/* Mobile tweaks */
 
-body.sharp {
-  background: linear-gradient(120deg, #d2d2d2, #f1f1f1);
-}
-
-/* Mobile */
-@media(max-width: 500px) {
-  #container { width: 90 percent; }
-  #timerDisplay { font-size: 40px; }
+@media (max-width: 500px) {
+  #container {
+    width: 90%;
+    margin-top: 40px;
+  }
 }
