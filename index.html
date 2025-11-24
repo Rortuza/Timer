@@ -3,13 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Timer</title>
+  <title>Aura Minutes</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="cozy">
+  <canvas id="confettiCanvas"></canvas>
+
+  <div id="splash">
+    <div id="splashContent">
+      <h2>Aura Minutes</h2>
+      <p>Getting things cozy for your focus.</p>
+    </div>
+  </div>
+
   <div id="container">
 
-    <h1 id="title">Study Timer</h1>
+    <h1 id="title">Aura Minutes</h1>
 
     <input id="taskName" type="text" placeholder="What are you working on?">
 
@@ -22,15 +31,28 @@
     </div>
 
     <div id="durationBox">
-      <label>Session length</label>
+      <label>Session length (minutes)</label>
       <input id="minutesInput" type="number" min="1" max="180" value="25">
     </div>
 
-    <select id="themeSelect">
-      <option value="calm">Calm</option>
-      <option value="cozy">Cozy</option>
-      <option value="sharp">Sharp</option>
-    </select>
+    <div id="encouragement"></div>
+
+    <div id="musicPlayer">
+      <label>Upload music</label>
+      <input id="musicInput" type="file" accept="audio/*">
+      <div id="musicControls">
+        <label class="loopLabel">
+          <input id="loopToggle" type="checkbox">
+          Loop music
+        </label>
+      </div>
+      <audio id="music" controls></audio>
+    </div>
+
+    <div id="notesBox">
+      <label for="notes">Little notes for this session</label>
+      <textarea id="notes" rows="3" placeholder="Thoughts, ideas, or tiny wins."></textarea>
+    </div>
 
     <div id="message"></div>
 
