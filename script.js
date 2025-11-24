@@ -1,5 +1,5 @@
 /* ---------------------------
-   AURA MINUTES - CLEAN SCRIPT
+   AURA MINUTES - STABLE BUILD
    --------------------------- */
 
 let timer;
@@ -26,7 +26,7 @@ const titleEl = document.getElementById("title");
 const canvas = document.getElementById("confettiCanvas");
 const ctx = canvas.getContext("2d");
 
-/* Encouragement pool */
+/* Encouragement messages */
 
 const encouragements = [
   "You are doing better than you think.",
@@ -41,9 +41,9 @@ const encouragements = [
   "Keep moving, even gently."
 ];
 
-/* ---------------------------------------------------------
-   INIT EVERYTHING
-   --------------------------------------------------------- */
+/* ------------------------------------------
+   SAFE INITIALIZATION
+   ------------------------------------------ */
 
 window.onload = () => {
   resizeCanvas();
@@ -52,17 +52,22 @@ window.onload = () => {
   resetIdleTimer();
 
   const saved = JSON.parse(localStorage.getItem("studyState"));
+
   if (saved) {
-    timeLeft = saved.timeLeft;
-    if (!Number.isFinite(timeLeft) || timeLeft <= 0) timeLeft = 25 * 60;
+    timeLeft = Number(saved.timeLeft);
+    if (!Number.isFinite(timeLeft) || timeLeft < 1) timeLeft = 25 * 60;
+
+    minutesInput.value = Number(saved.duration) || 25;
     taskName.value = saved.task || "";
-    minutesInput.value = saved.duration || 25;
     notes.value = saved.notes || "";
   } else {
     timeLeft = 25 * 60;
   }
 
   sessionDurationSeconds = Number(minutesInput.value) * 60;
+  if (!Number.isFinite(sessionDurationSeconds) || sessionDurationSeconds < 1) {
+    sessionDurationSeconds = 25 * 60;
+  }
 
   updateTitles();
   updateDisplay();
@@ -70,22 +75,34 @@ window.onload = () => {
 
   document.querySelectorAll("button").forEach(attachRipple);
 
-  /* Input listeners */
+  setupListeners();
+
+  setInterval(saveState, 4000);
+};
+
+/* ------------------------------------------
+   EVENT LISTENERS
+   ------------------------------------------ */
+
+function setupListeners() {
 
   taskName.addEventListener("input", () => {
     updateTitles();
     saveState();
   });
 
-  notes.addEventListener("input", () => saveState());
+  notes.addEventListener("input", saveState);
 
   minutesInput.addEventListener("input", () => {
-    const val = Number(minutesInput.value);
-    if (!val || val < 1) minutesInput.value = 1;
-    if (val > 180) minutesInput.value = 180;
+    let val = Number(minutesInput.value);
+
+    if (!val || val < 1) val = 1;
+    if (val > 180) val = 180;
+
+    minutesInput.value = val;
 
     if (!isRunning) {
-      sessionDurationSeconds = Number(minutesInput.value) * 60;
+      sessionDurationSeconds = val * 60;
       timeLeft = sessionDurationSeconds;
       updateDisplay();
       updateBackgroundGradient();
@@ -97,22 +114,16 @@ window.onload = () => {
     music.loop = loopToggle.checked;
   });
 
-  musicInput.onchange = () => {
+  musicInput.addEventListener("change", () => {
     const file = musicInput.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      music.src = url;
-      music.play();
-    }
-  };
-
-  /* Buttons */
+    if (!file) return;
+    music.src = URL.createObjectURL(file);
+    music.play();
+  });
 
   document.getElementById("startBtn").onclick = startTimer;
   document.getElementById("pauseBtn").onclick = pauseTimer;
   document.getElementById("resetBtn").onclick = resetTimer;
-
-  /* Page visibility */
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && isRunning) {
@@ -122,8 +133,6 @@ window.onload = () => {
     }
   });
 
-  /* Easter egg */
-
   titleEl.onclick = () => {
     titleClicks++;
     if (titleClicks === 5) {
@@ -132,13 +141,9 @@ window.onload = () => {
     }
   };
 
-  /* Encouragement rotation */
-
   setInterval(() => {
     if (isRunning) showEncouragement();
   }, 90000);
-
-  /* Warn before leaving */
 
   window.addEventListener("beforeunload", (e) => {
     if (isRunning) {
@@ -146,13 +151,11 @@ window.onload = () => {
       e.returnValue = "";
     }
   });
+}
 
-  setInterval(saveState, 4000);
-};
-
-/* ---------------------------------------------------------
-   UTIL FUNCTIONS
-   --------------------------------------------------------- */
+/* ------------------------------------------
+   CORE FUNCTIONS
+   ------------------------------------------ */
 
 function saveState() {
   localStorage.setItem("studyState", JSON.stringify({
@@ -176,8 +179,8 @@ function updateTitles() {
 
 function formatTime(sec) {
   const m = Math.floor(sec / 60);
-  const s = Math.max(0, sec % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  const s = sec % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 function updateDisplay() {
@@ -189,17 +192,17 @@ function showEncouragement() {
     encouragements[Math.floor(Math.random() * encouragements.length)];
 }
 
-/* Background shifting */
 function updateBackgroundGradient() {
-  if (!sessionDurationSeconds || sessionDurationSeconds <= 0) return;
+  if (!sessionDurationSeconds) return;
   const progress = 1 - timeLeft / sessionDurationSeconds;
+
   const hue1 = 310 - progress * 25;
   const hue2 = 270 - progress * 20;
+
   document.body.style.background =
     `linear-gradient(120deg, hsl(${hue1}, 90%, 88%), hsl(${hue2}, 75%, 80%))`;
 }
 
-/* Idle pulse */
 function resetIdleTimer() {
   titleEl.classList.remove("idle");
   clearTimeout(idleTimeout);
@@ -208,31 +211,19 @@ function resetIdleTimer() {
   }, 20000);
 }
 
-/* Button ripple */
-function attachRipple(button) {
-  button.addEventListener("click", function (e) {
-    const rect = button.getBoundingClientRect();
-    const ripple = document.createElement("span");
-    ripple.classList.add("ripple");
-    ripple.style.left = `${e.clientX - rect.left}px`;
-    ripple.style.top = `${e.clientY - rect.top}px`;
-    button.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 500);
-  });
-}
-
-/* ---------------------------------------------------------
+/* ------------------------------------------
    TIMER LOGIC
-   --------------------------------------------------------- */
+   ------------------------------------------ */
 
 function startTimer() {
   if (isRunning) return;
+
   isRunning = true;
   container.classList.add("active");
   message.textContent = "Focus mode on";
   showEncouragement();
 
-  if (!sessionDurationSeconds) {
+  if (!sessionDurationSeconds || sessionDurationSeconds < 1) {
     sessionDurationSeconds = Number(minutesInput.value) * 60 || 1500;
   }
 
@@ -245,6 +236,7 @@ function startTimer() {
       clearInterval(timer);
       isRunning = false;
       container.classList.remove("active");
+
       ding.play();
       message.textContent = "Session complete";
       showEncouragement();
@@ -256,6 +248,7 @@ function startTimer() {
     updateDisplay();
     updateBackgroundGradient();
     saveState();
+
   }, 1000);
 }
 
@@ -265,16 +258,18 @@ function pauseTimer() {
   isRunning = false;
   container.classList.remove("active");
   message.textContent = "Paused";
-  saveState();
 }
 
 function resetTimer() {
   clearInterval(timer);
   isRunning = false;
   container.classList.remove("active");
+
   sessionDurationSeconds = Number(minutesInput.value) * 60 || 1500;
   timeLeft = sessionDurationSeconds;
+
   confettiPieces = [];
+
   updateDisplay();
   updateBackgroundGradient();
   encouragementBox.textContent = "";
@@ -282,9 +277,9 @@ function resetTimer() {
   saveState();
 }
 
-/* ---------------------------------------------------------
+/* ------------------------------------------
    PARTICLES + CONFETTI
-   --------------------------------------------------------- */
+   ------------------------------------------ */
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -332,7 +327,7 @@ function drawScene() {
 
   ambientParticles.forEach(p => {
     p.y += p.speedY;
-    if (p.y > canvas.height + 10) p.y = -10;
+    if (p.y > canvas.height) p.y = -10;
     ctx.globalAlpha = p.alpha;
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
